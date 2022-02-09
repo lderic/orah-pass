@@ -1,2 +1,4 @@
-# orah-pass
-do orah pass automatically
+# Orah Pass
+
+---
+Do your orah pass simpler.
