@@ -43,7 +43,7 @@ object Users : Iterable<Users.User> {
         val config = File(System.getProperty("user.dir") + "/config.txt")
         if (!config.exists()) {
             config.createNewFile()
-            config.writeText("**LEAVE=0900\n**RETURN=1500//Use \"=\" to split username and password\n//every user use one line\n//example:\n//your_username=your_password\n//if you want write something which is not a user, please add // at first of the new line")
+            config.writeText("**LEAVE=0900\n**RETURN=1500\n//Use \"=\" to split username and password\n//every user use one line\n//example:\n//your_username=your_password\n//if you want write something which is not a user, please add // at first of the new line")
         }
         val reader = FileReader(config)
         val list = reader.readLines()
@@ -53,13 +53,14 @@ object Users : Iterable<Users.User> {
                 try {
                     val s = it.split("=")
                     if (s[0] == "**LEAVE") {
-                        Orah.leaveTime = s[0]
-                    } else if (s[1] == "**RETURN") {
-                        Orah.returnTime = s[0]
+                        Orah.leaveTime = s[1]
+                    } else if (s[0] == "**RETURN") {
+                        Orah.returnTime = s[1]
                     } else {
                         throw IllegalArgumentException("Start with ** but not a config text")
                     }
                 } catch (e: Exception) {
+                    println("An error occurs in line ${i + 1}")
                     e.printStackTrace()
                 }
             }else if (it.isNotEmpty() && !it.startsWith("//")) {

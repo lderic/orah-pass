@@ -20,7 +20,7 @@ repositories {
 tasks {
     jar {
         manifest {
-            attributes (Pair("Main-Class", "com.lderic.OrahKt"))
+            attributes (Pair("Main-Class", "com.lderic.orah.Main"))
         }
     }
 }
