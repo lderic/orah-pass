@@ -42,6 +42,9 @@ object CommandThread : Thread() {
                 "time" -> {
                     Time.nextPrettyPrint()
                 }
+                "cancel" -> {
+                    Time.cancelNext()
+                }
             }
         }
     }

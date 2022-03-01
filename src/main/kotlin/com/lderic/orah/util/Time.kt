@@ -4,10 +4,28 @@ import kotlinx.coroutines.delay
 import java.time.Instant
 import java.util.*
 
+@Suppress("DEPRECATION")
 object Time {
+    private var isNextCancel = false
+
     suspend fun waitUntilNext() {
-        val time = nextPrettyPrint()
-        delay(time)
+        do {
+            if (isNextCancel) {
+                println("时间被更改! 取消本次Orah")
+            }
+            isNextCancel = false
+            val time = nextPrettyPrint()
+            delay(time)
+        } while (isNextCancel)
+    }
+
+    fun cancelNext() {
+        if (isNextCancel) {
+            println("下次Orah已经被取消了!")
+        } else {
+            isNextCancel = true
+            println("操作成功, 已取消下次Orah")
+        }
     }
 
     fun millisecondToString(origin: Long): String {
@@ -22,7 +40,6 @@ object Time {
     }
 
     fun from(hour: Int, minute: Int, date: Int): String {
-
         val d = Date()
         d.hours = hour
         d.minutes = minute
@@ -32,17 +49,15 @@ object Time {
     }
 
     fun fromString(fourChars: String, date: Int = Date().date): String {
-        var s: String
-        try {
-            s = from(
+        return try {
+            from(
                 (fourChars[0].toString() + fourChars[1].toString()).toInt(),
                 (fourChars[2].toString() + fourChars[3].toString()).toInt(),
                 date
             )
         } catch (ignored: Exception) {
-            s = Instant.now().toString()
+            Instant.now().toString()
         }
-        return s
     }
 
     fun getNext(): Long {
@@ -51,15 +66,20 @@ object Time {
         d.hours = 8
         d.minutes = 30
         d.seconds = 0
-        return if (System.currentTimeMillis() >= d.time) {
-            d.time + 86400000
-        } else d.time
+        if (System.currentTimeMillis() >= d.time) {
+            d.time += 86400000
+            if (d.day == 6) {
+                d.time += 172800000
+            }
+            d.time
+        }
+        return d.time
     }
 
     fun nextPrettyPrint(): Long {
-        val time = getNext() - System.currentTimeMillis()
-        println("下次做orah的时间是 ${Date(getNext())}, 还剩${millisecondToString(time)}, ${time}毫秒, 现在开始计时")
-        return time
+        return (getNext() - System.currentTimeMillis()).also {
+            println("下次做orah的时间是 ${Date(getNext())}, 还剩${millisecondToString(it)}, ${it}毫秒, 现在开始计时")
+        }
     }
 }
 

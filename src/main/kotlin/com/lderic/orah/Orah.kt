@@ -13,10 +13,14 @@ import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 
+
 object Orah {
     const val newLeaveUrl = "https://orah-api-virginia.orah.com/1/student-api/schedule-new-leave"
     const val loginUrl = "https://api-virginia.orah.com/1/login"
+
+    @Suppress( "unused")
     const val logoutUrl = "https://app.orah.com/logout"
+    @Suppress( "unused")
     const val checkUrl = "https://app.orah.com/api/credential/byUsername?email="
 
     var leaveTime = "0900"
@@ -33,7 +37,6 @@ object Orah {
                 }
 
                 override fun close() {
-
                 }
 
                 override suspend fun get(requestUrl: Url): List<Cookie> {
@@ -44,12 +47,10 @@ object Orah {
         }
 
         install(JsonFeature) {
-            serializer = KotlinxSerializer(
-                kotlinx.serialization.json.Json {
-                    ignoreUnknownKeys = true
-                    encodeDefaults = true
-                }
-            )
+            serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
+                ignoreUnknownKeys = true
+                encodeDefaults = true
+            })
         }
         BrowserUserAgent()
     }
@@ -63,22 +64,15 @@ object Orah {
             httpClient.post<IsSuccessResponse>(newLeaveUrl) {
                 contentType(ContentType.Application.Json)
                 body = LeaveRequest(
-                    9419,
-                    LeaveRequest.LeaveInfo(
+                    9419, LeaveRequest.LeaveInfo(
                         departureTime = Time.fromString(leaveTime),
                         returnTime = Time.fromString(returnTime),
                         Ids.JUSTIN_SIENA,
                         note = "Please note if you have an after school activity here.",
                         leaveType = LeaveRequest.LeaveInfo.LeaveType(
-                            true,
-                            "Class and After School Activity Pass",
-                            "Yellow",
-                            "#140381",
-                            9419
+                            true, "Class and After School Activity Pass", "Yellow", "#140381", 9419
                         )
-                    ),
-                    action = "Create Upcoming Leave",
-                    requestInfo = LeaveRequest.RequestInfo()
+                    ), action = "Create Upcoming Leave", requestInfo = LeaveRequest.RequestInfo()
                 )
             }
             println("Do orah successful with username $username")
@@ -101,7 +95,6 @@ object Orah {
             false
         }
     }
-
 
     private suspend fun login(email: String, password: String): Boolean {
         val response = httpClient.post<IsSuccessResponse>(loginUrl) {
