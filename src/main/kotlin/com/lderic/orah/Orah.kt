@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json as json
 
 const val LOGIN_URL = "https://api-virginia.orah.com/1/login"
 const val NEW_SCHEDULE_URL = "https://orah-api-virginia.orah.com/1/student-api/schedule-new-leave?"
+const val CANCEL_URL = "https://api-virginia.orah.com/1/leave/entry/student/upcomingCancel"
 const val USERNAME = "iliduo@hotmail.com"
 const val PASSWORD = "eric52coco"
 
@@ -47,11 +48,18 @@ val client = HttpClient() {
 }
 
 fun main(): Unit = runBlocking {
+    login()
+    newSignIn(Time(hour = 9, minute = 0), Time(hour = 15, minute = 0)).also { println(it) }
+    cancel(6441462)
+}
+
+
+suspend fun login() {
     client.post<HttpStatement>(LOGIN_URL) {
         contentType(ContentType.Application.Json)
         header("referer", "https://app.orah.com/")
-        body = "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\"}"
-    }.execute  {
+        body = Login(PASSWORD, USERNAME)
+    }.execute {
         if (it.status == HttpStatusCode.OK) {
             println("Login success")
         } else {
@@ -59,9 +67,24 @@ fun main(): Unit = runBlocking {
             exitProcess(0)
         }
     }
-    client.post<OrahResponse>(NEW_SCHEDULE_URL) {
+}
+
+suspend fun newSignIn(start: Time, end: Time): Int {
+    val response = client.post<OrahResponse>(NEW_SCHEDULE_URL) {
         contentType(ContentType.Application.Json)
         header("referer", "https://app.orah.com/")
-        body = createNewOrahLeave(Time(9, 0), Time(15, 0))
-    }.also { if (it.success) println("Success") else println("Failed") }
+        body = createNewOrahLeave(start, end)
+    }
+    if (response.success) println("Success") else println("Failed")
+    return response.leave.id
+}
+
+suspend fun cancel(id: Int) {
+    client.delete<HttpStatement>(CANCEL_URL) {
+        contentType(ContentType.Application.Json)
+        header("referer", "https://app.orah.com/")
+        body = cancelOrah(id)
+    }.execute {
+        if (it.status.isSuccess()) println("Cancel success") else println("Cancel failed")
+    }
 }
