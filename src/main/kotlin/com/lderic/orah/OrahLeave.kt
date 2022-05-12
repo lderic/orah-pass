@@ -53,14 +53,19 @@ data class OrahLeave(
     )
 }
 
-data class Time(val hour: Int, val minute: Int)
+data class Time(
+    val date: Int = Calendar.getInstance().let {
+        it.add(Calendar.DAY_OF_MONTH, 1)
+        it.get(Calendar.DAY_OF_MONTH)
+    },
+    val hour: Int,
+    val minute: Int
+)
 
 fun createNewOrahLeave(departureTime: Time, returnTime: Time): OrahLeave {
-    fun newTime(hour: Int, minute: Int): String {
+    fun newTime(date: Int, hour: Int, minute: Int): String {
         val c = Calendar.getInstance()
-        if (c.get(Calendar.HOUR_OF_DAY) >= hour) {
-            c.add(Calendar.DAY_OF_MONTH, 1)
-        }
+        c.set(Calendar.DAY_OF_MONTH, date)
         c.set(Calendar.HOUR_OF_DAY, hour)
         c.set(Calendar.MINUTE, minute)
         c.set(Calendar.SECOND, 0)
@@ -69,8 +74,8 @@ fun createNewOrahLeave(departureTime: Time, returnTime: Time): OrahLeave {
     }
     return OrahLeave(
         leaveInfo = OrahLeave.LeaveInfo(
-            departureTime = newTime(departureTime.hour, departureTime.minute),
-            returnTime = newTime(returnTime.hour, returnTime.minute)
+            departureTime = newTime(departureTime.date, departureTime.hour, departureTime.minute),
+            returnTime = newTime(returnTime.date, returnTime.hour, returnTime.minute)
         )
     )
 }

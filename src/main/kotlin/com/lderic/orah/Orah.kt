@@ -49,7 +49,7 @@ val client = HttpClient() {
 
 fun main(): Unit = runBlocking {
     login()
-    newSignIn(Time(hour = 9, minute = 0), Time(hour = 15, minute = 0)).also { println(it) }
+    newSignIn(Time(date = 13, hour = 9, minute = 0), Time(date = 13, hour = 15, minute = 0)).also { println(it) }
 }
 
 
