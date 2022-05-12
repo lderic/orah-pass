@@ -50,12 +50,11 @@ val client = HttpClient() {
 fun main(): Unit = runBlocking {
     login()
     newSignIn(Time(hour = 9, minute = 0), Time(hour = 15, minute = 0)).also { println(it) }
-    cancel(6441462)
 }
 
 
 suspend fun login() {
-    client.post<HttpStatement>(LOGIN_URL) {
+    client.post<HttpStatement>("https://api-virginia.orah.com/1/login") {
         contentType(ContentType.Application.Json)
         header("referer", "https://app.orah.com/")
         body = Login(PASSWORD, USERNAME)
@@ -70,7 +69,7 @@ suspend fun login() {
 }
 
 suspend fun newSignIn(start: Time, end: Time): Int {
-    val response = client.post<OrahResponse>(NEW_SCHEDULE_URL) {
+    val response = client.post<OrahResponse>("https://orah-api-virginia.orah.com/1/student-api/schedule-new-leave?") {
         contentType(ContentType.Application.Json)
         header("referer", "https://app.orah.com/")
         body = createNewOrahLeave(start, end)
